@@ -1,0 +1,11 @@
+{
+    "course_length": 50.0,
+    "course_width": 72.0,
+    "max_acceleration": 5.0,
+    "max_jerk": 5.0,
+    "max_velocity": 21.0,
+    "sample_count": 10000,
+    "time_step": 0.25,
+    "wheelbase_length": 8.0,
+    "wheelbase_width": 8.0
+}
