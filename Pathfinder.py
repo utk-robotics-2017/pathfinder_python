@@ -13,7 +13,7 @@ from TankModifier import TankModifier
 from SplineGenerator import FitType
 
 class Pathfinder:
-    def __init__(self, folder):
+    def setFolder(self, folder):
         self.folder = folder
 
     def setupFolder(self):
@@ -27,9 +27,7 @@ class Pathfinder:
         os.chmod("%s/robotConfig.json" % self.folder, 077)
 
         json_file = open(filepath)
-        file_text = ""
-        for line in json_file:
-            file_text += line
+        file_text = json_file.read()
         config = json.loads(file_text)
         self.trajectoryConfig = TrajectoryConfig()
         self.trajectoryConfig.max_v = config['max_velocity']
@@ -142,7 +140,8 @@ if __name__ == "__main__":
     ap.add_argument("-s", "--swerve", required=False, help="Swerve trajectory will be written")
     args = vars(ap.parse_args())
 
-    p = Pathfinder(args['folder'])
+    p = Pathfinder()
+    p.setFolder(args['folder'])
     p.setupFolder()
     p.loadConfig(args['config'])
     p.loadWaypoints(args['waypoints'])
