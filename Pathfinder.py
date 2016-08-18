@@ -12,6 +12,10 @@ from SwerveModifier import SwerveModifier
 from TankModifier import TankModifier
 from SplineGenerator import FitType
 
+class DrivebaseType(Enum):
+    TANK = 0
+    SWERVE = 1
+
 class Pathfinder:
     def setFolder(self, folder):
         self.folder = folder
@@ -22,9 +26,10 @@ class Pathfinder:
         os.makedirs(self.folder, 0777)
         os.chmod(self.folder, 0777)
 
-    def loadConfig(self, filepath):
-        shutil.copyfile(filepath, "%s/robotConfig.json" % self.folder)
-        os.chmod("%s/robotConfig.json" % self.folder, 077)
+    def loadConfig(self, filepath, copy=True):
+        if copy:
+            shutil.copyfile(filepath, "%s/robotConfig.json" % self.folder)
+            os.chmod("%s/robotConfig.json" % self.folder, 077)
 
         json_file = open(filepath)
         file_text = json_file.read()
@@ -37,22 +42,25 @@ class Pathfinder:
         self.trajectoryConfig.sample_count = config['sample_count']
         self.wheelbaseWidth = config['wheelbase_width']
         self.wheelbaseLength = config['wheelbase_length']
-        if config['splineType'] == "CUBIC":
-            self.splineType = FitType.CUBIC
-        elif config['splineType'] == "QUINTIC":
-            self.splineType = FitType.QUINTIC
-        else:
-            print "Unknown Spline Type"
-            sys.exit()
+        self.splineType = config['splineType']
+        self.drivebaseType = config['drivebaseType']
 
-    def loadWaypoints(self, filepath):
-        shutil.copyfile(filepath, "%s/waypoints.csv" % self.folder)
-        os.chmod("%s/waypoints.csv" % self.folder, 077)
+    def loadWaypoints(self, filepath, copy=True):
+        if copy:
+            shutil.copyfile(filepath, "%s/waypoints.csv" % self.folder)
+            os.chmod("%s/waypoints.csv" % self.folder, 077)
         self.waypoints = []
         with open(filepath) as csv_file:
             reader = csv.DictReader(csv_file)
             for row in reader:
-                self.waypoints.append(Waypoiny(x=row['x'], y=row['y'], theta=row['theta']))
+                self.waypoints.append(Waypoint(x=row['x'], y=row['y'], theta=row['theta']))
+
+    def saveWaypoints(self):
+        with open("%s/waypoints.csv" % self.folder, 'w') as csv_file
+            fieldnames = ['x', 'y', 'theta']
+            writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
+            for waypoint in self.waypoints:
+                writer.write({'x': waypoint.x, 'y': waypoint.y, 'theta': waypoint.theta})
 
     def generateTrajectory(self):
         if not hasattr(self, 'trajectoryConfig'):
