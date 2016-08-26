@@ -53,12 +53,13 @@ class TrajectoryGenerator:
 
         spline_i = 0
         spline_pos_initial = 0.0
-        spline_complete = 0.0
 
         for i in range(trajectory_length):
-            pos = segments[i].position
+            displacement = segments[i].displacement
+
             while True:
-                pos_relative = pos - spline_pos_initial
+                pos_relative = displacement - spline_pos_initial
+                # all but the last point on a spline
                 if(pos_relative <= spline_lengths[spline_i]):
                     si = splines[spline_i]
                     percentage = self.splineUtils.get_progress_for_distance(si, pos_relative, self.config.sample_count)
@@ -67,10 +68,11 @@ class TrajectoryGenerator:
                     segments[i].x = coords.x
                     segments[i].y = coords.y
                     break
+                # finish a spline
                 elif spline_i < path_length - 2:
-                    spline_complete = spline_complete + spline_lengths[spline_i]
-                    spline_pos_initial = spline_complete
-                    spline_i = spline_i + 1
+                    spline_pos_initial += spline_lengths[spline_i]
+                    spline_i += 1
+                # Very last point
                 else:
                     si = splines[path_length - 2]
                     segments[i].heading = self.splineUtils.get_angle(si, 1.0)

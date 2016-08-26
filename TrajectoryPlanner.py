@@ -27,7 +27,7 @@ class TrajectoryPlanner:
 
         d_theta = self.config.dest_theta - self.config.src_theta
         for i in range(self.info.length):
-            segments[i].heading = self.config.src_theta + d_theta * segments[i].position / (segments[-1].position)
+            segments[i].heading = self.config.src_theta + d_theta * segments[i].displacement / (segments[-1].displacement)
 
         return segments
 
@@ -69,10 +69,10 @@ class TrajectoryPlanner:
 
             f2 = f2 / self.info.filter1
 
-            seg = Segment(dt=self.info.dt, x=0.0, y=0.0, position=0.0, velocity=0.0, acceleration=0.0, jerk=0.0, heading=0.0)
+            seg = Segment(dt=self.info.dt, x=0.0, y=0.0, displacement=0.0, velocity=0.0, acceleration=0.0, jerk=0.0, heading=0.0)
             seg.velocity = f2 / self.info.filter2 * self.info.v
-            seg.position = (last_section.velocity + seg.velocity) / 2.0 * seg.dt + last_section.position
-            seg.x = seg.position
+            seg.displacement = (last_section.velocity + seg.velocity) / 2.0 * seg.dt + last_section.displacement
+            seg.x = seg.displacement
             seg.y = 0.0
             seg.acceleration = (seg.velocity - last_section.velocity) / seg.dt
             seg.jerk = (seg.acceleration - last_section.acceleration) / seg.dt

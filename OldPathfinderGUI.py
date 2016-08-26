@@ -616,11 +616,11 @@ class Application(Frame):
         self.swerve_back_right_segments = swerveModifier.get_back_right_trajectory()
 
     def write_trajectory(self, file_, segments):
-        fieldnames = ['dt', 'x', 'y', 'position', 'velocity', 'acceleration', 'jerk', 'heading']
+        fieldnames = ['dt', 'x', 'y', 'displacement', 'velocity', 'acceleration', 'jerk', 'heading']
         writer = csv.DictWriter(file_, fieldnames=fieldnames)
         writer.writeheader()
         for segment in segments:
-            writer.writerow({'dt': segment.dt, 'x': segment.x, 'y': segment.y, 'position': segment.position, 'velocity': segment.velocity, 'acceleration': segment.acceleration, 'jerk': segment.jerk, 'heading': segment.heading})
+            writer.writerow({'dt': segment.dt, 'x': segment.x, 'y': segment.y, 'displacement': segment.displacement, 'velocity': segment.velocity, 'acceleration': segment.acceleration, 'jerk': segment.jerk, 'heading': segment.heading})
 
     def exportTrajectories(self):
         options = {'defaultextension': '.csv',
