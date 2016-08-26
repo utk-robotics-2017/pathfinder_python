@@ -6,10 +6,11 @@ from SplineUtils import SplineUtils
 
 
 class TrajectoryGenerator:
-    def __init__(self, path, config, fit_type=FitType.CUBIC):
+    def __init__(self, path, config):
         self.path = path
         self.config = config
-        self.splineGenerator = SplineGenerator(fit_type)
+        self.splineGenerator3 = SplineGenerator(FitType.CUBIC)
+        self.splineGenerator5 = SplineGenerator(FitType.QUINTIC)
         self.trajectory = Trajectory()
         self.splineUtils = SplineUtils()
         self.planner = TrajectoryPlanner(config)
@@ -25,8 +26,33 @@ class TrajectoryGenerator:
 
         self.trajectory.total_length = 0
         for i in range(len(self.path) - 1):
-            s = self.splineGenerator.fit(self.path[i], self.path[i + 1])
-            dist = self.splineUtils.get_arc_length(s, self.config.sample_count)
+            s3 = self.splineGenerator3.fit(self.path[i], self.path[i + 1])
+            dist3 = self.splineUtils.get_arc_length(s3, self.config.sample_count)
+            
+            s3_rev = self.splineGenerator3.fit(self.path[i + 1], self.path[i])
+            dist3_rev = self.splineUtils.get_arc_length(s3_rev, self.config.sample_count)
+
+            s5 = self.splineGenerator5.fit(self.path[i], self.path[i + 1])
+            dist5 = self.splineUtils.get_arc_length(s5, self.config.sample_count)
+
+            s5_rev = self.splineGenerator5.fit(self.path[i + 1], self.path[i])
+            dist5_rev = self.splineUtils.get_arc_length(s5_rev, self.config.sample_count)
+
+            min_dist = min(dist3, dist3_rev, dist5, dist5_rev)
+            
+            if min_dist == dist3:
+                s = s3
+                dist = dist3
+            elif min_dist == dist3_rev:
+                s = s3_rev
+                dist = dist3_rev
+            elif min_dist == dist5:
+                s = s5
+                dist = dist5
+            else:
+                s = s5_rev
+                dist = dist5_rev
+            
             self.trajectory.spline_list.append(s)
             self.trajectory.length_list.append(dist)
             self.trajectory.total_length = self.trajectory.total_length + dist

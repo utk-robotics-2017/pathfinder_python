@@ -579,10 +579,7 @@ class Application(Frame):
         for displayWaypoint in self.waypoints:
             trajectoryWaypoints.append(Waypoint(displayWaypoint.x.get(), displayWaypoint.y.get(), displayWaypoint.theta.get()))
 
-        if self.splineType.get() == "Cubic":
-            generator = TrajectoryGenerator(trajectoryWaypoints, trajectoryConfig, FitType.CUBIC)
-        elif self.splineType.get() == "Quintic":
-            generator = TrajectoryGenerator(trajectoryWaypoints, trajectoryConfig, FitType.QUINTIC)
+        generator = TrajectoryGenerator(trajectoryWaypoints, trajectoryConfig)
         self.trajectory_segments = generator.generate()
 
         errorMessage = ""
@@ -705,12 +702,6 @@ class Application(Frame):
         self.wheelbaseLength = DoubleVar()
         self.wheelbaseLength.set(0.0)
         Entry(self.root, textvariable=self.wheelbaseLength).grid(row=9, column=2)
-
-        Label(self.root, text="Spline Type").grid(row=10, column=1)
-        self.splineType = StringVar()
-        self.splineType.set("Cubic")
-        self.splineType.trace('w', self.updateDraw)
-        OptionMenu(self.root, self.splineType, "Cubic", "Quintic").grid(row=10, column=2)
 
         self.configError = StringVar()
         self.configError.set("")
