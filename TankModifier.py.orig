@@ -28,7 +28,11 @@ class TankModifier:
                 last = self.left_traj[i - 1]
                 distance = math.sqrt((left.x - last.x) * (left.x - last.x) + (left.y - last.y) * (left.y - last.y))
 
+<<<<<<< HEAD
+                left.position = last.position + distance
+=======
                 left.displacement += distance
+>>>>>>> c79e99bd0eb5f9b5c126f9252b06aafa55dc6f48
                 left.velocity = distance / seg.dt
                 left.acceleration = (left.velocity - last.velocity) / seg.dt
                 left.jerk = (left.acceleration - last.acceleration) / seg.dt
@@ -39,7 +43,11 @@ class TankModifier:
                 last = self.right_traj[i - 1]
                 distance = math.sqrt((right.x - last.x) * (right.x - last.x) + (right.y - last.y) * (right.y - last.y))
 
+<<<<<<< HEAD
+                right.position = last.position + distance
+=======
                 right.displacement += distance
+>>>>>>> c79e99bd0eb5f9b5c126f9252b06aafa55dc6f48
                 right.velocity = distance / seg.dt
                 right.acceleration = (right.velocity - last.velocity) / seg.dt
                 right.jerk = (right.acceleration - last.acceleration) / seg.dt
