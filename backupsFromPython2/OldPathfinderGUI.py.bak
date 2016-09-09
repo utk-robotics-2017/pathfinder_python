@@ -1,6 +1,6 @@
-from tkinter import *
-from tkinter.filedialog import askopenfilename
-from tkinter.filedialog import asksaveasfilename
+from Tkinter import *
+from tkFileDialog import askopenfilename
+from tkFileDialog import asksaveasfilename
 from PIL import Image, ImageTk
 import cv2
 import csv

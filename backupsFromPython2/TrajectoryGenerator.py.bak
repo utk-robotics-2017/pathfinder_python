@@ -17,7 +17,7 @@ class TrajectoryGenerator:
 
     def prepare(self):
         if(len(self.path) < 2):
-            print("Error: TrajectoryGenerator preparation failed: path length is less than 2")
+            print "Error: TrajectoryGenerator preparation failed: path length is less than 2"
             return
 
         self.trajectory.spline_list = []
