@@ -15,8 +15,8 @@ clientId = 0
 
 port = 9001
 pin = random.randint(0, 99999)
-pathsFolder = "/paths"
-configFilepath = "%s/robotConfig.json" % pathsFolder
+pathsFolder = "/Robot/Trajectories"
+configFilepath = "{}/robotConfig.json".format(pathsFolder)
 p = Pathfinder
 def log(wsId, message):
     print("{}\tClient {:2d}\t{}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
