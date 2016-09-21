@@ -24,13 +24,13 @@ class Pathfinder:
     def setupFolder(self):
         if os.path.exists(self.folder):
             shutil.rmtree(self.folder)
-        os.makedirs(self.folder, 0777)
-        os.chmod(self.folder, 0777)
+        os.makedirs(self.folder, 0o777)
+        os.chmod(self.folder, 0o777)
 
     def loadConfig(self, filepath, copy=True):
         if copy:
             shutil.copyfile(filepath, "%s/robotConfig.json" % self.folder)
-            os.chmod("%s/robotConfig.json" % self.folder, 077)
+            os.chmod("%s/robotConfig.json" % self.folder, 0o777)
 
         json_file = open(filepath)
         file_text = json_file.read()
@@ -49,7 +49,7 @@ class Pathfinder:
     def loadWaypoints(self, filepath, copy=True):
         if copy:
             shutil.copyfile(filepath, "%s/waypoints.csv" % self.folder)
-            os.chmod("%s/waypoints.csv" % self.folder, 077)
+            os.chmod("%s/waypoints.csv" % self.folder, 0o777)
         self.waypoints = []
         with open(filepath) as csv_file:
             reader = csv.DictReader(csv_file)
@@ -57,7 +57,7 @@ class Pathfinder:
                 self.waypoints.append(Waypoint(x=row['x'], y=row['y'], theta=row['theta']))
 
     def saveWaypoints(self):
-        with open("%s/waypoints.csv" % self.folder, 'w') as csv_file
+        with open("%s/waypoints.csv" % self.folder, 'w') as csv_file:
             fieldnames = ['x', 'y', 'theta']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             for waypoint in self.waypoints:
@@ -65,11 +65,11 @@ class Pathfinder:
 
     def generateTrajectory(self):
         if not hasattr(self, 'trajectoryConfig'):
-            print "Config file has not been loaded"
+            print("Config file has not been loaded")
             sys.exit()
 
         if not hasattr(self, 'waypoints'):
-            print "Waypoints file has not been loaded"
+            print("Waypoints file has not been loaded")
             sys.exit()
 
         generator = TrajectoryGenerator(self.waypoints, self.trajectoryConfig, self.splineType)

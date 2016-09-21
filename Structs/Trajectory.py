@@ -1,5 +1,5 @@
-from TrajectoryInfo import TrajectoryInfo
-from TrajectoryConfig import TrajectoryConfig
+from .TrajectoryInfo import TrajectoryInfo
+from .TrajectoryConfig import TrajectoryConfig
 
 
 class Trajectory:

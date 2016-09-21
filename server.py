@@ -1,3 +1,4 @@
+import os
 import sys
 import random
 import signal
@@ -7,6 +8,7 @@ import csv
 
 import tornado.ioloop
 import tornado.websocket
+import tornado.httpserver
 
 from Pathfinder import Pathfinder
 
@@ -17,11 +19,11 @@ port = 9001
 pin = random.randint(0, 99999)
 pathsFolder = "/Robot/Trajectories"
 configFilepath = "{}/robotConfig.json".format(pathsFolder)
-p = Pathfinder
+p = Pathfinder()
 def log(wsId, message):
     print("{}\tClient {:2d}\t{}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
 
-class server(tornado.websocket.WebSocketHandler):
+class Server(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
         return True
 
@@ -54,21 +56,15 @@ class server(tornado.websocket.WebSocketHandler):
                 log(self.id, "entered wrong pin")
 
         else:
-            cmd = "Command"
-            if message[:len(cmd)] == cmd:
-                # Execute logic for Command
-                # Additional logic will be in "message[len(cmd):]"
-                return
-
             cmd = "GetConfig"
             if message[:len(cmd)] == cmd:
                 if not os.path.exists(configFilepath):
-                    self.write_message("[]")
-                    log(self.id, "no file, sending an empty list")
+                    self.write_message("{}")
+                    log(self.id, "no file, sending an empty object")
                 else:
                     with open(configFilepath, 'r') as jsonFile:
                         jsonData = jsonFile.read().replace('\n', '')
-                        self.write_message("RobotConfig:" + jsonData)
+                        self.write_message("RobotConfig" + jsonData)
                         log(self.id, "requested robot config")
                 return
 
@@ -76,7 +72,7 @@ class server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 with open(configFilepath, 'w') as jsonFile:
                     jsonFile.write(message[len(cmd):])
-                    p.loadConfig(configFile, False)
+                    p.loadConfig(configFilepath, False)
                     self.write_message("PostedRobotConfig")
                     log(self.id, "posted robot config")
                 return
@@ -84,10 +80,10 @@ class server(tornado.websocket.WebSocketHandler):
             cmd = "GetWaypoints"
             if message[:len(cmd)] == cmd:
                 pathName = message[len(cmd):]
-                p.loadWaypoints("%s/%s/waypoints.csv" % (pathsFolder, pathName), False)
+                p.loadWaypoints("{}/{}/waypoints.csv".format(pathsFolder, pathName), False)
                 waypointsJson = json.dumps(p.waypoints).replace('\n', '')
-                self.write_message("Waypoints:"+waypointsJson)
-                log(self.id, "request waypoints for %s" % pathName)
+                self.write_message("Waypoints" + waypointsJson)
+                log(self.id, "requested waypoints for " + pathName)
                 return
 
             cmd = "GetTrajectories"
@@ -108,9 +104,9 @@ class server(tornado.websocket.WebSocketHandler):
                     response['swerve_back_left_trajectory'] = p.swerve_back_left_segments
                     response['swerve_back_right_trajectory'] = p.swerve_back_right_segments
                 else:
-                    print "Unknown Database Type"
+                    print("Unknown Database Type")
 
-                self.write_message("Trajectories:" + json.dumps(response).replace('\n', '')
+                self.write_message("Trajectories" + json.dumps(response).replace('\n', ''))
                 log(self.id, "request for trajectories")
                 return
 
@@ -118,7 +114,7 @@ class server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 messageJson = json.loads(message[len(cmd):])
                 p.waypoints = messageJson['waypoints']
-                p.setFolder("%s/%s" % (pathsFolder, messageJson['pathName']))
+                p.setFolder("{}/{}".format(pathsFolder, messageJson['pathName']))
                 p.saveWaypoints()
                 p.writeTrajectory()
                 if p.drivebaseType == DrivebaseType.TANK:
@@ -126,7 +122,7 @@ class server(tornado.websocket.WebSocketHandler):
                 elif p.drivebaseType == DrivebaseType.SWERVE:
                     p.writeSwerveTrajectory()
                 else:
-                    print "Unknown Drivebase Type"
+                    print("Unknown Drivebase Type")
 
                 return
 
@@ -134,10 +130,18 @@ class server(tornado.websocket.WebSocketHandler):
         clients.remove(self)
         log(self.id, "disconnected")
 
+class SetupTLS(tornado.web.RequestHandler):
+    def get(self):
+        self.write("TLS certificate has been accepted, please try the websocket again.")
+
 def make_app():
-    return tornado.web.Application([
-        (r"/", server)
-    ])
+    return tornado.httpserver.HTTPServer(tornado.web.Application([
+        (r"/", Server),
+        (r"/setuptls", SetupTLS)
+    ]), ssl_options={
+        "certfile": "/etc/ssl/certs/tornado.crt",
+        "keyfile": "/etc/ssl/certs/tornado.key"
+    })
 
 def sigInt_handler(signum, frame):
     print(" Closing Server")
