@@ -8,7 +8,3 @@ class Segment:
         self.acceleration = acceleration
         self.jerk = jerk
         self.heading = heading
-
-    def toString(self):
-        print "dt: %f x: %f y: %f d: %f v: %f a: %f j: %f h: %f" % (self.dt, self.x,
-        self.y, self.displacement, self.velocity, self.acceleration, self.jerk, self.heading)

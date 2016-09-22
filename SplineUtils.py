@@ -88,5 +88,6 @@ class SplineUtils:
 
         interpolated = t
         if arc_length != last_arc_length:
-            interpolated = interpolated + ((distance - last_arc_length) / (arc_length - last_arc_length) - 1) / sample_count_d
+            interpolated = interpolated + ((distance - last_arc_length) /
+                                           (arc_length - last_arc_length) - 1) / sample_count_d
         return interpolated

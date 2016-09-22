@@ -1,14 +1,14 @@
+import os
 import sys
 import random
 import signal
 import time
 import json
-import csv
 
 import tornado.ioloop
 import tornado.websocket
 
-from Pathfinder import Pathfinder
+from Pathfinder import Pathfinder, DrivebaseType
 
 clients = set()
 clientId = 0
@@ -16,10 +16,13 @@ clientId = 0
 port = 9001
 pin = random.randint(0, 99999)
 pathsFolder = "/Robot/Trajectories"
-configFilepath = "{}/robotConfig.json".format(pathsFolder)
+configFilepath = "{0:s}/robotConfig.json".format(pathsFolder)
 p = Pathfinder
+
+
 def log(wsId, message):
-    print("{}\tClient {:2d}\t{}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
+    print("{0:s}\tClient {1:2d}\t{2:s}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
+
 
 class server(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -76,7 +79,7 @@ class server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 with open(configFilepath, 'w') as jsonFile:
                     jsonFile.write(message[len(cmd):])
-                    p.loadConfig(configFile, False)
+                    p.loadConfig(configFilepath, False)
                     self.write_message("PostedRobotConfig")
                     log(self.id, "posted robot config")
                 return
@@ -110,7 +113,7 @@ class server(tornado.websocket.WebSocketHandler):
                 else:
                     print "Unknown Database Type"
 
-                self.write_message("Trajectories:" + json.dumps(response).replace('\n', '')
+                self.write_message("Trajectories:" + json.dumps(response).replace('\n', ''))
                 log(self.id, "request for trajectories")
                 return
 
@@ -134,10 +137,12 @@ class server(tornado.websocket.WebSocketHandler):
         clients.remove(self)
         log(self.id, "disconnected")
 
+
 def make_app():
     return tornado.web.Application([
         (r"/", server)
     ])
+
 
 def sigInt_handler(signum, frame):
     print(" Closing Server")
