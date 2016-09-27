@@ -81,10 +81,24 @@ class Server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 pathName = message[len(cmd):]
                 p.loadWaypoints("{}/{}/waypoints.csv".format(pathsFolder, pathName), False)
-                waypointsJson = json.dumps(p.waypoints).replace('\n', '')
+                waypointsJson = json.dumps([w.__dict__ for w in p.waypoints]).replace('\n', '')
                 self.write_message("Waypoints" + waypointsJson)
                 log(self.id, "requested waypoints for " + pathName)
                 return
+
+            cmd = "PostWaypoints"
+            if message[:len(cmd)] == cmd:
+                data = json.loads(message[len(cmd):])
+                pathName = data["name"]
+                waypoints = data["waypoints"]
+
+                filename = "{}/{}/waypoints.csv".format(pathsFolder, pathName)
+                os.makedirs(os.path.dirname(filename), exist_ok=True)
+                with open(filename, "w") as f:
+                    f.write("x,y,theta\n")
+                    for w in waypoints:
+                        f.write("{},{},{}\n".format(w['x'], w['y'], w['r']))
+                log(self.id, "posted waypoints for " + pathName)
 
             cmd = "GetTrajectories"
             if message[:len(cmd)] == cmd:
