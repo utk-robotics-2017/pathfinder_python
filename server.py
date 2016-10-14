@@ -4,13 +4,12 @@ import random
 import signal
 import time
 import json
-import csv
 
 import tornado.ioloop
 import tornado.websocket
 import tornado.httpserver
 
-from Pathfinder import Pathfinder
+from Pathfinder import Pathfinder, DrivebaseType
 
 clients = set()
 clientId = 0
@@ -18,10 +17,13 @@ clientId = 0
 port = 9001
 pin = random.randint(0, 99999)
 pathsFolder = "/Robot/Trajectories"
-configFilepath = "{}/robotConfig.json".format(pathsFolder)
-p = Pathfinder()
+configFilepath = "{0:s}/robotConfig.json".format(pathsFolder)
+p = Pathfinder
+
+
 def log(wsId, message):
-    print("{}\tClient {:2d}\t{}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
+    print("{0:s}\tClient {1:2d}\t{2:s}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
+
 
 class Server(tornado.websocket.WebSocketHandler):
     def check_origin(self, origin):
@@ -120,7 +122,7 @@ class Server(tornado.websocket.WebSocketHandler):
                 else:
                     print("Unknown Database Type")
 
-                self.write_message("Trajectories" + json.dumps(response).replace('\n', ''))
+                self.write_message("Trajectories:" + json.dumps(response).replace('\n', ''))
                 log(self.id, "request for trajectories")
                 return
 
@@ -144,9 +146,11 @@ class Server(tornado.websocket.WebSocketHandler):
         clients.remove(self)
         log(self.id, "disconnected")
 
+
 class SetupTLS(tornado.web.RequestHandler):
     def get(self):
         self.write("TLS certificate has been accepted, please try the websocket again.")
+
 
 def make_app():
     return tornado.httpserver.HTTPServer(tornado.web.Application([
@@ -156,6 +160,7 @@ def make_app():
         "certfile": "/etc/ssl/certs/tornado.crt",
         "keyfile": "/etc/ssl/certs/tornado.key"
     })
+
 
 def sigInt_handler(signum, frame):
     print(" Closing Server")

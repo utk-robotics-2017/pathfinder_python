@@ -1,7 +1,3 @@
-from .TrajectoryInfo import TrajectoryInfo
-from .TrajectoryConfig import TrajectoryConfig
-
-
 class Trajectory:
     spline_list = []
     length_list = []

@@ -1,6 +1,7 @@
 import math
 import copy
 
+
 class TankModifier:
     def __init__(self, original, wheelbase_width):
         self.original = original
