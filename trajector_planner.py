@@ -1,5 +1,5 @@
-from Structs.TrajectoryInfo import TrajectoryInfo
-from Structs.Segment import Segment
+from structs.trajectory_info import TrajectoryInfo
+from structs.segment import Segment
 import math
 
 

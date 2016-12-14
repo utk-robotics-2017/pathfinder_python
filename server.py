@@ -9,7 +9,7 @@ import tornado.ioloop
 import tornado.websocket
 import tornado.httpserver
 
-from Pathfinder import Pathfinder, DrivebaseType
+from pathfinder import Pathfinder, DrivebaseType
 
 clients = set()
 clientId = 0

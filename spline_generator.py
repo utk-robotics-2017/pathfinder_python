@@ -1,7 +1,7 @@
 import math
 from mathutil import bound_radians
 from enum import Enum
-from Structs.Spline import Spline
+from structs.spline import Spline
 
 
 class FitType(Enum):

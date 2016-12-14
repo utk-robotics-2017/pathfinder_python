@@ -1,8 +1,8 @@
-from Structs.Trajectory import Trajectory
-from SplineGenerator import SplineGenerator
-from SplineGenerator import FitType
-from TrajectoryPlanner import TrajectoryPlanner
-from SplineUtils import SplineUtils
+from structs.trajectory import Trajectory
+from spline_generator import SplineGenerator
+from spline_generator import FitType
+from trajectory_planner import TrajectoryPlanner
+from spline_utils import SplineUtils
 
 
 class TrajectoryGenerator:

@@ -1,5 +1,5 @@
 import math
-from Structs.Coord import Coord
+from structs.coord import Coord
 from mathutil import bound_radians
 
 

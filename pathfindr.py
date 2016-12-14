@@ -6,11 +6,11 @@ import csv
 import sys
 from enum import Enum
 
-from Structs.TrajectoryConfig import TrajectoryConfig
-from Structs.Waypoint import Waypoint
-from TrajectoryGenerator import TrajectoryGenerator
-from SwerveModifier import SwerveModifier
-from TankModifier import TankModifier
+from structs.trajectoryConfig import TrajectoryConfig
+from structs.waypoint import Waypoint
+from trajectory_generator import TrajectoryGenerator
+from swerve_modifier import SwerveModifier
+from tank_modifier import TankModifier
 
 
 class DrivebaseType(Enum):
