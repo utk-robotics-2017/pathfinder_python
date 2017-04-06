@@ -19,35 +19,31 @@ class DrivebaseType(Enum):
 
 
 class Pathfinder:
-    def setFolder(self, folder):
+    def set_folder(self, folder):
         self.folder = folder
+        self.setup_folder()
 
-    def setupFolder(self):
+    def setup_folder(self):
         if os.path.exists(self.folder):
             shutil.rmtree(self.folder)
         os.makedirs(self.folder, 0o777)
         os.chmod(self.folder, 0o777)
 
-    def loadConfig(self, filepath, copy=True):
+    def load_config(self, filepath, copy=True):
         if copy:
-            shutil.copyfile(filepath, "%s/robotConfig.json" % self.folder)
-            os.chmod("%s/robotConfig.json" % self.folder, 0o777)
+            shutil.copyfile(filepath, "%s/robot_config.json" % self.folder)
+            os.chmod("%s/robot_config.json" % self.folder, 0o777)
 
         json_file = open(filepath)
         file_text = json_file.read()
         config = json.loads(file_text)
-        self.trajectoryConfig = TrajectoryConfig()
-        self.trajectoryConfig.max_v = config['max_velocity']
-        self.trajectoryConfig.max_a = config['max_acceleration']
-        self.trajectoryConfig.max_j = config['max_jerk']
-        self.trajectoryConfig.dt = config['time_step']
-        self.trajectoryConfig.sample_count = config['sample_count']
-        self.wheelbaseWidth = config['wheelbase_width']
-        self.wheelbaseLength = config['wheelbase_length']
-        self.splineType = config['splineType']
-        self.drivebaseType = config['drivebaseType']
+        self.trajectory_config = TrajectoryConfig(**config)
+        self.wheelbase_width = config['wheelbase_width']
+        self.wheelbase_length = config['wheelbase_length']
+        self.spline_type = config['spline_type']
+        self.drivebase_type = config['drivebase_type']
 
-    def loadWaypoints(self, filepath, copy=True):
+    def load_waypoints(self, filepath, copy=True):
         if copy:
             shutil.copyfile(filepath, "%s/waypoints.csv" % self.folder)
             os.chmod("%s/waypoints.csv" % self.folder, 0o777)
@@ -57,14 +53,14 @@ class Pathfinder:
             for row in reader:
                 self.waypoints.append(Waypoint(x=row['x'], y=row['y'], theta=row['theta']))
 
-    def saveWaypoints(self):
+    def save_waypoints(self):
         with open("%s/waypoints.csv" % self.folder, 'w') as csv_file:
             fieldnames = ['x', 'y', 'theta']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
             for waypoint in self.waypoints:
                 writer.write({'x': waypoint.x, 'y': waypoint.y, 'theta': waypoint.theta})
 
-    def generateTrajectory(self):
+    def generate_trajectory(self):
         if not hasattr(self, 'trajectoryConfig'):
             print("Config file has not been loaded")
             sys.exit()
@@ -73,29 +69,28 @@ class Pathfinder:
             print("Waypoints file has not been loaded")
             sys.exit()
 
-        generator = TrajectoryGenerator(self.waypoints, self.trajectoryConfig, self.splineType)
+        generator = TrajectoryGenerator(self.waypoints, self.trajectory_config, self.spline_type)
         self.segments = generator.generate()
 
-    def writeTrajectory(self):
+    def write_trajectory(self):
+        self.generate_trajectory()
 
-        self.generateTrajectory()
-
-        fieldnames = ['dt', 'x', 'y', 'displacement', 'velocity', 'acceleration', 'jerk', 'heading']
+        fieldnames = ['dt', 'displacement', 'velocity', 'acceleration', 'jerk', 'heading']
         writer = csv.DictWriter("%s/trajectory.csv" % self.folder, fieldnames=fieldnames)
         writer.writeheader()
         for segment in self.segments:
             writer.writerow(segment.__dict__)
 
-    def generateTankTrajectory(self):
+    def generate_tank_trajectory(self):
         if not hasattr(self, 'segments'):
-            self.generateTrajectory()
+            self.generate_trajectory()
 
-        tankModifier = TankModifier(self.segments, self.wheelbase_width)
-        self.tank_left_segments = tankModifier.get_left_trajectory()
-        self.tank_right_segments = tankModifier.get_right_trajectory()
+        tank_modifier = TankModifier(self.segments, self.wheelbase_width)
+        self.tank_left_segments = tank_modifier.get_left_trajectory()
+        self.tank_right_segments = tank_modifier.get_right_trajectory()
 
-    def writeTankTrajectory(self):
-        self.generateTankTrajectory()
+    def write_tank_trajectory(self):
+        self.generate_tank_trajectory()
         fieldnames = ['dt', 'x', 'y', 'displacement', 'velocity', 'acceleration', 'jerk', 'heading']
         writer = csv.DictWriter("%s/left_tank_trajectory.csv" % self.folder, fieldnames=fieldnames)
         writer.writeheader()
@@ -107,18 +102,18 @@ class Pathfinder:
         for segment in self.tank_right_segments:
             writer.writerow(segment.__dict__)
 
-    def generateSwerveTrajectory(self):
+    def generate_swerve_trajectory(self):
         if not hasattr(self, 'segments'):
-            self.generateTrajectory()
+            self.generate_trajectory()
 
-        swerveModifier = SwerveModifier(self.segments, self.wheelbase_width, self.wheelbase_length)
-        self.swerve_front_left_segments = swerveModifier.get_front_left_trajectory()
-        self.swerve_front_right_segments = swerveModifier.get_front_right_trajectory()
-        self.swerve_back_left_segments = swerveModifier.get_back_left_trajectory()
-        self.swerve_back_right_segments = swerveModifier.get_back_right_trajectory()
+        swerve_modifier = SwerveModifier(self.segments, self.wheelbase_width, self.wheelbase_length)
+        self.swerve_front_left_segments = swerve_modifier.get_front_left_trajectory()
+        self.swerve_front_right_segments = swerve_modifier.get_front_right_trajectory()
+        self.swerve_back_left_segments = swerve_modifier.get_back_left_trajectory()
+        self.swerve_back_right_segments = swerve_modifier.get_back_right_trajectory()
 
-    def writeSwerveTrajectory(self):
-        self.generateSwerveTrajectory()
+    def write_swerve_trajectory(self):
+        self.generate_swerve_trajectory()
         fieldnames = ['dt', 'x', 'y', 'displacement', 'velocity', 'acceleration', 'jerk', 'heading']
         writer = csv.DictWriter("%s/swerve_front_left_trajectory.csv" % self.folder, fieldnames=fieldnames)
         writer.writeheader()
@@ -150,12 +145,11 @@ if __name__ == "__main__":
     args = vars(ap.parse_args())
 
     p = Pathfinder()
-    p.setFolder(args['folder'])
-    p.setupFolder()
-    p.loadConfig(args['config'])
-    p.loadWaypoints(args['waypoints'])
-    p.writeTrajectory()
+    p.set_folder(args['folder'])
+    p.load_config(args['config'])
+    p.load_waypoints(args['waypoints'])
+    p.write_trajectory()
     if(args['tank']):
-        p.writeTankTrajectory()
+        p.write_tank_trajectory()
     if(args['swerve']):
-        p.writeSwerveTrajectory()
+        p.write_swerve_trajectory()
