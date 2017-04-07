@@ -2,6 +2,7 @@ from enum import IntEnum
 
 class SplineType(IntEnum):
 	HERMITE_CUBIC = 0
+	HERMITE_QUINTIC = 1
 
 class Spline:
 	def calculate(self, t):

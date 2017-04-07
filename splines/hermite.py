@@ -32,8 +32,14 @@ class Hermite(Spline):
 		x = self.hyp_distance * t
 		y = 0
 		if self.type_ == SplineType.HERMITE_CUBIC:
-			y = self.a * (t ** 3 - 2 * t ** 2 + t) + b * (t ** 3 - t ** 2)
-		# TODO: QUINTIC
+			y = (((self.tangent0 + self.tangent1) * self.hyp_distance * t ** 3)
+				 + (-(2 * self.tangent0 + self.tangent1) * self.hyp_distance * t ** 2)
+				 + self.tangent0 * self.hyp_distance * t)
+		elif self.type_ == SplineType.HERMITE_QUINTIC:
+			y = ((-3 * (self.tangent0 + self.tangent1)) * self.hyp_distance * t ** 5
+				 + (8 * self.tangent0 + 7 * self.tangent1) * self.hyp_distance * t ** 4
+				 + (-(6 * self.tangent0 + 4 * self.tangent1)) * self.hyp_distance * t ** 3
+				 + self.tangent0 * self.hyp_distance * t)
 
 		# Translate back to global
 		coord.x = x * math.cos(self.angle_offset) - y * math.sin(self.angle_offset) + self.x_offset
@@ -50,7 +56,16 @@ class Hermite(Spline):
 		return coord
 
 	def deriv(self, t):
-		return a * (3 * t ** 2 - 4 * t + 1) + b * (3 * t  ** 2 - 2 * t)
+		x = self.hyp_distance * t
+		if self.type_ == SplineType.HERMITE_CUBIC:
+			return (3 * (self.tangent0 + self.tangent1) * t ** 2)
+			        + (2 * -(2 * self.tangent0 + self.tangent1) * t
+			        + self.tangent0)
+		elif self.type_ == SplineType.HERMITE_QUINTIC:
+			return (5 * (-(3*(self.tangent0 + self.tangent1))) * t ** 4
+                    + 4 * (8 * self.tangent0 + 7 * self.tangent1) * t ** 3
+                    + 3 * (-(6 * self.tangent0 + 4 * self.tangent1)) * t ** 2
+                    + self.tangent0)
 
 	def arc_length(self, samples):
 		if self.last_arc_calc_samples != samples:

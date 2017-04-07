@@ -1,4 +1,4 @@
-class TrajectoryConfig:
+class Config:
     def __init__(self, **kwargs):
         self.dt = 0.0
         self.max_velocity = 0.0

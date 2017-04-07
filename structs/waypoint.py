@@ -1,5 +1,5 @@
 class Waypoint:
-    def __init__(self, x, y, theta):
+    def __init__(self, x, y, angle):
         self.x = x
         self.y = y
-        self.angle = theta
+        self.angle = angle

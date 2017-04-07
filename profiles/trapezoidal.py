@@ -9,7 +9,7 @@ class Trapezoidal(Profile):
 
     def calculate(self, t, previous_segment=None):
         if previous_segment is None:
-            previous_segment = Segment(displacement=0, velocity=0, acceleration=0, time=0)
+            previous_segment = Segment(distance=0, velocity=0, acceleration=0, time=0)
 
         segment = Segment(time=t)
 
@@ -18,26 +18,26 @@ class Trapezoidal(Profile):
 
         dt = t - previous_segment.time
 
-        if previous_segment.displacement >= self.setpoint:
-            segment.displacement = previous_segment.displacement
+        if previous_segment.distance >= self.setpoint:
+            segment.distance = previous_segment.distance
             return Status.DONE, segment
 
         # Deceleration zone
-        if previous_segment.displacement + decel_distance >= self.setpoint:
+        if previous_segment.distance + decel_distance >= self.setpoint:
             segment.acceleration = -self.acceleration
             segment.velocity = previous_segment.velocity - self.acceleration * dt
-            segment.displacement = previous_segment.displacement + previous_segment.velocity * dt - (0.5 * self.acceleration * dt ** 2)
+            segment.distance = previous_segment.distance + previous_segment.velocity * dt - (0.5 * self.acceleration * dt ** 2)
             return Status.DECEL, segment
 
         # Acceleration zone
         if previous_segment.velocity < self.max_velocity:
             segment.acceleration = self.acceleration
             segment.velocity = min(previous_segment.velocity + self.acceleration * dt, self.max_velocity)
-            segment.displacement = previous_segment.displacement + previous_segment.velocity * dt + 0.5 * self.acceleration * dt ** 2
+            segment.distance = previous_segment.distance + previous_segment.velocity * dt + 0.5 * self.acceleration * dt ** 2
             return Status.ACCEL, segment
 
         # Level
         segment.acceleration = 0
         segment.velocity = previous_segment.velocity
-        segment.displacement = previous_segment.displacement + previous_segment.velocity * dt
+        segment.distance = previous_segment.distance + previous_segment.velocity * dt
         return Status.LEVEL, segment
