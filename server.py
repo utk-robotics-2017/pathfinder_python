@@ -9,7 +9,7 @@ import tornado.ioloop
 import tornado.websocket
 import tornado.httpserver
 
-from pathfinder import Pathfinder, DrivebaseType
+from pathfinder import Pathfinder
 
 clients = set()
 clientId = 0
@@ -97,7 +97,7 @@ class Server(tornado.websocket.WebSocketHandler):
                 filename = "{}/{}/waypoints.csv".format(pathsFolder, pathName)
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 with open(filename, "w") as f:
-                    f.write("x,y,theta\n")
+                    f.write("x,y,angle\n")
                     for w in waypoints:
                         f.write("{},{},{}\n".format(w['x'], w['y'], w['r']))
                 log(self.id, "posted waypoints for " + pathName)
@@ -108,19 +108,12 @@ class Server(tornado.websocket.WebSocketHandler):
                 p.waypoints = json.loads(waypointsJson)
                 response = dict()
                 p.generateTrajectory()
-                response['trajectory'] = p.segments
-                if p.drivebaseType == DrivebaseType.TANK:
-                    p.generateTankTrajectory()
-                    response['tank_left_trajectory'] = p.tank_left_segments
-                    response['tank_right_trajectory'] = p.tank_right_segments
-                elif p.drivebaseType == DrivebaseType.SWERVE:
-                    p.generateSwerveTrajectory()
-                    response['swerve_front_left_trajectory'] = p.swerve_front_left_segments
-                    response['swerve_front_right_trajectory'] = p.swerve_front_right_segments
-                    response['swerve_back_left_trajectory'] = p.swerve_back_left_segments
-                    response['swerve_back_right_trajectory'] = p.swerve_back_right_segments
-                else:
-                    print("Unknown Database Type")
+                center = [s.center_2d for s in p.segments]
+                response['trajectory'] = center
+                left = [s.left_2d for s in p.segments]
+                right = [s.right_2d for s in p.segments]
+                response['tank_left_trajectory'] = left
+                response['tank_right_trajectory'] = right
 
                 self.write_message("Trajectories:" + json.dumps(response).replace('\n', ''))
                 log(self.id, "request for trajectories")
@@ -133,12 +126,7 @@ class Server(tornado.websocket.WebSocketHandler):
                 p.setFolder("{}/{}".format(pathsFolder, messageJson['pathName']))
                 p.saveWaypoints()
                 p.writeTrajectory()
-                if p.drivebaseType == DrivebaseType.TANK:
-                    p.writeTankTrajectory()
-                elif p.drivebaseType == DrivebaseType.SWERVE:
-                    p.writeSwerveTrajectory()
-                else:
-                    print("Unknown Drivebase Type")
+                p.writeTankTrajectory()
 
                 return
 
