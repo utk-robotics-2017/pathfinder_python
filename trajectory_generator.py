@@ -9,7 +9,7 @@ class TrajectoryGenerator:
         self.config = config
         self.spline_type = spline_type
 
-        if spline_type == SplineType.HERMITE_CUBIC
+        if spline_type == SplineType.HERMITE_CUBIC or spline_type == SplineType.HERMITE_QUINTIC:
             self.spline_class = Hermite
 
         self.profile_type = profile_type
@@ -91,7 +91,7 @@ class TrajectoryGenerator:
             angular_velocity = 2 * math.pi + angular_velocity
         angular_velocity /= dt
         # Avoid divide by 0
-        if t = 0:
+        if t == 0:
             angular_velocity = 0
 
         tangential_speed = angular_velocity * self.wheelbase

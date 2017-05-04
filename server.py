@@ -74,7 +74,7 @@ class Server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 with open(configFilepath, 'w') as jsonFile:
                     jsonFile.write(message[len(cmd):])
-                    p.loadConfig(configFilepath, False)
+                    p.load_config(configFilepath, False)
                     self.write_message("PostedRobotConfig")
                     log(self.id, "posted robot config")
                 return
@@ -82,7 +82,7 @@ class Server(tornado.websocket.WebSocketHandler):
             cmd = "GetWaypoints"
             if message[:len(cmd)] == cmd:
                 pathName = message[len(cmd):]
-                p.loadWaypoints("{}/{}/waypoints.csv".format(pathsFolder, pathName), False)
+                p.load_waypoints("{}/{}/waypoints.csv".format(pathsFolder, pathName), False)
                 waypointsJson = json.dumps([w.__dict__ for w in p.waypoints]).replace('\n', '')
                 self.write_message("Waypoints" + waypointsJson)
                 log(self.id, "requested waypoints for " + pathName)
@@ -107,7 +107,7 @@ class Server(tornado.websocket.WebSocketHandler):
                 waypointsJson = message[len(cmd):]
                 p.waypoints = json.loads(waypointsJson)
                 response = dict()
-                p.generateTrajectory()
+                p.generate_trajectory()
                 center = [s.center_2d for s in p.segments]
                 response['trajectory'] = center
                 left = [s.left_2d for s in p.segments]
@@ -123,11 +123,10 @@ class Server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 messageJson = json.loads(message[len(cmd):])
                 p.waypoints = messageJson['waypoints']
-                p.setFolder("{}/{}".format(pathsFolder, messageJson['pathName']))
-                p.saveWaypoints()
-                p.writeTrajectory()
-                p.writeTankTrajectory()
-
+                p.set_folder("{}/{}".format(pathsFolder, messageJson['pathName']))
+                p.save_waypoints()
+                p.write_trajectory()
+                p.write_tank_trajectory()
                 return
 
     def on_close(self):
