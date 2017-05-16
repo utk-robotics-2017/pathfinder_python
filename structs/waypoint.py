@@ -1,5 +1,15 @@
+from ..util.decorators import attr_check, type_check
+from ..util.units import Distance, Angle
+
+
+@attr_check
 class Waypoint:
-    def __init__(self, x, y, angle):
+    x = Distance
+    y = Distance
+    angle = Angle
+
+    @type_check
+    def __init__(self, x: Distance, y: Distance, angle: Angle):
         self.x = x
         self.y = y
         self.angle = angle

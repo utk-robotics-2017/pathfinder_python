@@ -3,7 +3,10 @@ from splines.spline import SplineType
 from splines.hermite import Hermite
 from profiles.profile import ProfileType
 from profiles.trapezoidal import Trapezoidal
+from util.decorators import attr_check, type_check
 
+
+@attr_check
 class TrajectoryGenerator:
     def __init__(self, config, spline_type=SplineType.HERMITE_CUBIC, profile_type=ProfileType.TRAPEZOIDAL):
         self.config = config
@@ -17,12 +20,13 @@ class TrajectoryGenerator:
         if profile_type == ProfileType.TRAPEZOIDAL:
             self.profile = Trapezoidal(max_velocity=config.max_velocity, acceleration=config.max_acceleration)
 
-    def generate(self, waypoints):
+    @type_check
+    def generate(self, waypoints: list) -> list:
         self.waypoints = waypoints
 
         self.splines = self.spline_class.get_splines(self.spline_type, self.waypoints)
 
-        self.total_distance = Spline.distance(splines)
+        self.total_distance = Spline.distance(self.splines)
 
         self.profile.setpoint(self.total_distance)
 
@@ -42,8 +46,8 @@ class TrajectoryGenerator:
 
         return segments
 
-
-    def calculate(self, t, previous_segment):
+    @type_check
+    def calculate(self, t: Time, previous_segment: CoupledSegment) -> CoupledSegment:
         current_distance = previous_segment.center.distance
 
         if current_distance >= self.total_distance:
@@ -138,3 +142,5 @@ class TrajectoryGenerator:
             segment.center.acceleration = (center_speed - previous_segment.center.velocity) / dt
             segment.left.acceleration = (vl - previous_segment.left.velocity) / dt
             segment.right.acceleration = (vr - previous_segment.right.velocity) / dt
+
+        return segment
