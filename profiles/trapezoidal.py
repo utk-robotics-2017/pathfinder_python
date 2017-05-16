@@ -1,7 +1,7 @@
 from .profile import Profile, Status
-from ..util.decorators import attr_check, type_check
-from ..util.units import Distance, Velocity, Acceleration
-from ..structs.segment import Segment
+from util.decorators import attr_check, type_check, void
+from util.units import Distance, Velocity, Acceleration, Time
+from structs.segment import Segment
 
 
 @attr_check
@@ -36,16 +36,16 @@ class Trapezoidal(Profile):
             accel = -self.acceleration
 
         decel_time = previous_segment.velocity / accel
-        decel_distance =  previous_segment.velocity * decel_time - 0.5 * accel * decel_time ** 2
+        decel_distance = previous_segment.velocity * decel_time - 0.5 * accel * decel_time ** 2
 
         decel_error = previous_segment.distance + decel_distance - self.setpoint
 
         sixth = 1 / 6
 
         # Deceleration zone
-        if (abs(decel_error) <= self.tolerance or
-            (self.setpoint < 0 and decel_error < self.tolerance) or
-            (self.setpoint > 0 and decel_error > self.tolerance)):
+        if(abs(decel_error) <= self.tolerance or
+           (self.setpoint < 0 and decel_error < self.tolerance) or
+           (self.setpoint > 0 and decel_error > self.tolerance)):
             segment.acceleration = -accel
             segment.velocity = previous_segment.velocity - (accel * dt)
             segment.distance = previous_segment.distance + (previous_segment.velocity * dt) - (0.5 * accel * dt ** 2)

@@ -1,18 +1,18 @@
 from enum import IntEnum
-from ..util.units import Distance
-from ..util.decorators import attr_check, type_check
-from ..structs.segment import Segment
+from util.units import Distance, Time
+from util.decorators import attr_check, type_check, void
+from structs.segment import Segment
 
 
 class ProfileType(IntEnum):
-	TRAPEZOIDAL = 0
+    TRAPEZOIDAL = 0
 
 
 class Status(IntEnum):
-	DONE = 0
-	DECEL = 1
-	ACCEL = 2
-	LEVEL = 3
+    DONE = 0
+    DECEL = 1
+    ACCEL = 2
+    LEVEL = 3
 
 
 @attr_check
