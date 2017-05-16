@@ -1,7 +1,7 @@
 from enum import IntEnum
 import numpy as np
 import math
-from .spine import Spline, SplineType
+from .spline import Spline, SplineType
 
 
 class Hermite(Spline):
