@@ -1,3 +1,4 @@
+#!/usr/bin/env python3.6
 import os
 import sys
 import random
@@ -160,6 +161,7 @@ def sigInt_handler(signum, frame):
     tornado.ioloop.IOLoop.current().stop()
     print("Server is closed")
     sys.exit(0)
+
 
 if __name__ == "__main__":
     app = make_app()
