@@ -1,4 +1,16 @@
+from ..util.units import Distance, Velocity, Acceleration, Jerk, Time
+from ..util.decorators import attr_check, type_check
+
+
+@attr_check
 class Segment:
+    time = Time
+    distance = Distance
+    velocity = Velocity
+    acceleration = Acceleration
+    jerk = Jerk
+
+    @type_check
     def __init__(self, **kwargs):
         self.time = 0
         self.distance = 0

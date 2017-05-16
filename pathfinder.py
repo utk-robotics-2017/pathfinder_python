@@ -81,7 +81,7 @@ class Pathfinder:
         right_writer = csv.DictWriter("%s/right_tank_trajectory.csv" % self.folder, fieldnames=fieldnames)
         right_writer.writeheader()
         for segment in self.segments:
-            left_writer.writerow({**segment.left.__dict__, **segment.left_2d.__dict__})
+            left_writer.writerow({**segment.left.__dict__(), **segment.left_2d.__dict__()})
             right_writer.writerow({**segment.right.__dict__, **segment.right_2d.__dict__})
 
 if __name__ == "__main__":
