@@ -14,8 +14,6 @@ from util.units import Distance
 from util.logger import Logger
 logger = Logger()
 
-
-@singleton
 @attr_check
 class Pathfinder:
     ''' The main class for generating discretized splines for path
@@ -38,7 +36,7 @@ class Pathfinder:
     '''
 
     folder = str
-    trajectory_config = TrajectoryConfig
+    trajectory_config = Config
     wheelbase = Distance
     spline_type = int
     waypoints = list
@@ -80,7 +78,7 @@ class Pathfinder:
         with open(filepath) as json_file:
             file_text = json_file.read()
         config = json.loads(file_text)
-        self.trajectory_config = TrajectoryConfig(**config)
+        self.trajectory_config = Config(**config)
         self.wheelbase = Distance(config['wheelbase'])
         self.spline_type = config['spline_type']
 

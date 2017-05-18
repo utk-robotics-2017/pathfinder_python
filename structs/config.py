@@ -1,9 +1,20 @@
+from util.decorators import attr_check
+from util.units import Time, Velocity, Acceleration, Jerk
+
+@attr_check
 class Config:
+
+    dt = Time
+    max_velocity = Velocity
+    max_acceleration = Acceleration
+    max_jerk = Jerk
+    sample_count = int
+
     def __init__(self, **kwargs):
-        self.dt = 0.0
-        self.max_velocity = 0.0
-        self.max_acceleration = 0.0
-        self.max_jerk = 0.0
-        self.sample_count = 0
+        self.dt = Time(kwargs['dt'])
+        self.max_velocity = Velocity(kwargs['max_velocity'])
+        self.max_acceleration = Acceleration(kwargs['max_acceleration'])
+        self.max_jerk = Jerk(kwargs['max_jerk'])
+        self.sample_count = int(kwargs['sample_count'])
 
         self.__dict__.update(kwargs)

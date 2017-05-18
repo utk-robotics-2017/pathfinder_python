@@ -12,10 +12,8 @@ class Segment:
 
     @type_check
     def __init__(self, **kwargs):
-        self.time = 0
-        self.distance = 0
-        self.velocity = 0
-        self.acceleration = 0
-        self.jerk = 0
-
-        self.__dict__.update(kwargs)
+        self.time = kwargs.get('time', Time(0))
+        self.distance = kwargs.get('distance', Distance(0))
+        self.velocity = kwargs.get('velocity', Velocity(0))
+        self.acceleration = kwargs.get('acceleration', Acceleration(0))
+        self.jerk = kwargs.get('jerk', Jerk(0))

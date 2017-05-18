@@ -1,12 +1,13 @@
 from structs.trajectory import Trajectory
-from structs.trajectory_config import TrajectoryConfig
+from structs.config import Config
+from structs.coupled_segment import CoupledSegment
 from splines.spline import SplineType
 from splines.hermite import Hermite
-from profiles.profile import ProfileType
+from profiles.profile import Profile, ProfileType
 from profiles.trapezoidal import Trapezoidal
-from util.decorators import attr_check, type_check
+from util.decorators import attr_check, type_check, singleton
+from util.units import Distance, Time
 
-@singleton
 @attr_check
 class TrajectoryGenerator:
     ''' Generates the trajectory from the given config and waypoints
@@ -24,7 +25,7 @@ class TrajectoryGenerator:
         profile: Profile
             Motion Profile generator
     '''
-    config = TrajectoryConfig
+    config = Config
     spline_type = (int, SplineType)
     # TODO: determine is class is a type for spline_class
     profile_type = (int, ProfileType)
@@ -36,7 +37,7 @@ class TrajectoryGenerator:
     spline_number = int
 
     @type_check
-    def __init__(self, config: TrajectoryConfig, spline_type: (int, SplineType)=SplineType.HERMITE_CUBIC, profile_type: (int, ProfileType)=ProfileType.TRAPEZOIDAL):
+    def __init__(self, config: Config, spline_type: (int, SplineType)=SplineType.HERMITE_CUBIC, profile_type: (int, ProfileType)=ProfileType.TRAPEZOIDAL):
         ''' Constructor
 
             Parameters
