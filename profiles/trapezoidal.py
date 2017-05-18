@@ -6,6 +6,21 @@ from structs.segment import Segment
 
 @attr_check
 class Trapezoidal(Profile):
+    ''' A type of motion profile based on a trapezoid
+
+        Attributes
+        ----------
+        max_velocity : Velocity
+            The maximum velocity of the robot
+
+        acceleration : Acceleration
+
+        tolerance : Distance
+            The amount of leeway for reaching the setpoint
+
+        distance_integral : Distance
+            Used for the Scurve.
+    '''
     max_velocity = Velocity
     acceleration = Acceleration
     distance_integral = Distance
@@ -18,6 +33,22 @@ class Trapezoidal(Profile):
 
     @type_check
     def calculate(self, t: Time, previous_segment: (void, Segment)=None):
+        ''' Calculates the next segment based on the previous one
+
+            Parameters
+            ----------
+            t : Time
+                The start time for the next segment
+            previous_segment : Segment
+                The previous segment in the path
+
+            Returns
+            -------
+            Status
+                The status of the motion profile
+            Segment
+                The next segment in the path
+        '''
         if previous_segment is None:
             previous_segment = Segment(distance=0, velocity=0, acceleration=0, time=0)
 
