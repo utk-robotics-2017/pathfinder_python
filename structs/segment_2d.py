@@ -3,6 +3,17 @@ from util.decorators import attr_check, type_check
 
 @attr_check
 class Segment2D:
+    ''' A 2D representation of a segment.
+
+        Attributes
+        ----------
+        x : Distance
+            The x coordinate of the start of this segment
+        y : Distance
+            The y coordinate of the start of this segment
+        angle : Angle
+            The angle the robot should be facing at the start of this segment
+    '''
     x = Distance
     y = Distance
     angle = Angle

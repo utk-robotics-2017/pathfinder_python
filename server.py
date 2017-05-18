@@ -27,6 +27,8 @@ def log(wsId, message):
 
 
 class Server(tornado.websocket.WebSocketHandler):
+    ''' Web server for working with the pathfinder web gui <https://utk-robotics-2017.github.io/Pathfinder/index.html>
+    '''
     def check_origin(self, origin):
         return True
 
