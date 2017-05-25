@@ -15,16 +15,17 @@ class Scurve(Profile):
     velocity_profile = Trapezoidal
 
     @type_check
-    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, jerk: Jerk, tolerance: Distance=Distance(0.05 * Distance.inch)):
+    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, jerk: Jerk, tolerance: Distance=Distance(0.05 , Distance.inch), timescale: Time=Time(0.001, Time.s)):
         self.max_velocity = max_velocity
         self.max_acceleration = acceleration
         self.jerk = jerk
         self.tolerance = tolerance
+        self.timescale = timescale
 
-        self.velocity_profile = Trapezoidal(acceleration, jerk, tolerance)
+        self.velocity_profile = Trapezoidal(acceleration, jerk, tolerance, timescale)
         self.velocity_profile.set_setpoint(max_velocity)
 
-    def calculate(self, t: Time, previous_segment: (void, Segment)=None):
+    def calculate_single(self, t: Time, previous_segment: (void, Segment)=None):
 
 
         velocity_segment_in = Segment(time=previous_segment.time,

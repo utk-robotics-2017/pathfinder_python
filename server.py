@@ -143,17 +143,10 @@ class SetupTLS(tornado.web.RequestHandler):
 
 
 def make_app():
-    return tornado.httpserver.HTTPServer(tornado.web.Application([
-        (r"/", Server),
-        (r"/setuptls", SetupTLS)
-    ]), ssl_options={
-        "certfile": "/etc/ssl/certs/tornado.crt",
-        "keyfile": "/etc/ssl/certs/tornado.key"
-    })
+    return tornado.httpserver.HTTPServer(tornado.web.Application([(r"/", Server), (r"/setuptls", SetupTLS)]))
 
 
 def sigInt_handler(signum, frame):
-    print(" Closing Server")
 
     while clients:
         client = next(iter(clients))

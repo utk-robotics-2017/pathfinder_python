@@ -29,7 +29,9 @@ def attr_check(cls):
             value = getter_setter_gen(key, value)
         rv[key] = value
     # Creates a new class, using the modified dictionary as the class dict:
-    return type(cls)(cls.__name__, cls.__bases__, rv)
+    new_cls = type(cls)(cls.__name__, cls.__bases__, rv)
+    new_cls.__doc__ = cls.__doc__
+    return new_cls
 
 
 def type_check(f):
@@ -53,6 +55,7 @@ def type_check(f):
                             .format(f.__name__, result, type(result), sig.return_annotation))
 
         return result
+    wrapper.__doc__ = f.__doc__
     return wrapper
 
 

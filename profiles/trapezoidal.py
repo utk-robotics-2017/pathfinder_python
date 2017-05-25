@@ -26,13 +26,14 @@ class Trapezoidal(Profile):
     distance_integral = Distance
 
     @type_check
-    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, tolerance: Distance=Distance(0.05 * Distance.inch)):
+    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, tolerance: Distance=Distance(0.05, Distance.inch), timescale: Time=Time(0.001, Time.s)):
         self.max_velocity = max_velocity
         self.acceleration = acceleration
         self.tolerance = tolerance
+        self.timescale = timescale
 
     @type_check
-    def calculate(self, t: Time, previous_segment: (void, Segment)=None):
+    def calculate_single(self, t: Time, previous_segment: (void, Segment)=None):
         ''' Calculates the next segment based on the previous one
 
             Parameters

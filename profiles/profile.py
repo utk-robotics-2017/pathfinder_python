@@ -32,6 +32,7 @@ class Profile:
     '''
     setpoint = Distance
     tolerance = Distance
+    timescale = Time
 
     # TODO: create properties
     @type_check
@@ -51,7 +52,15 @@ class Profile:
         return self.tolerance
 
     @type_check
-    def calculate(self, t: Time, previous_segment: (void, Segment)=None):
+    def set_timescale(self, timescale: Time) -> void:
+        self.timescale = timescale
+
+    @type_check
+    def get_timescale(self) -> Time:
+        return self.timescale
+
+    @type_check
+    def calculate_single(self, t: Time, previous_segment: (void, Segment)=None):
         ''' Calculates the next segment based on the values from the previous one
 
             Note
@@ -59,3 +68,40 @@ class Profile:
             Effectively a virtual function which must be overwritten by a child
         '''
         raise NotImplementedError("Profile calculate")
+
+    @type_check
+    def calculate(self, t: Time, previous_segment: (void, Segment)=None):
+        ''' Calculates the next segment based on the previous one
+
+            Parameters
+            ----------
+            t : Time
+                The start time for the next segment
+            previous_segment : Segment
+                The previous segment in the path
+
+            Returns
+            -------
+            Status
+                The status of the motion profile
+            Segment
+                The next segment in the path
+        '''
+        temp = Segment(time=previous_segment.time, distance=previous_segment.distance, velocity=previous_segment.velocity, acceleration=previous_segment.acceleration)
+
+        dt = t - previous_segment.time
+
+        slice_count = int(dt.base_value / self.timescale.base_value)
+
+
+        # The time difference provided is smaller than the target timescale,
+        # use the smaller of the two.
+        if(slice_count < 1):
+            return self.calculate_single(t, previous_segment)
+        else:
+            for i in range(slice_count):
+                time_slice = temp.time + self.timescale
+                status, temp = self.calculate_single(time_slice, temp)
+                if status == Status.DONE:
+                    break
+        return temp
