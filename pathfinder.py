@@ -9,10 +9,11 @@ from structs.config import Config
 from structs.waypoint import Waypoint
 from trajectory_generator import TrajectoryGenerator
 
-from util.decorators import singleton, attr_check, type_check, void
-from util.units import Distance
-from util.logger import Logger
+from utils.decorators import attr_check, type_check, void
+from utils.units import Distance
+from utils.logger import Logger
 logger = Logger()
+
 
 @attr_check
 class Pathfinder:
@@ -40,7 +41,6 @@ class Pathfinder:
     wheelbase = Distance
     spline_type = int
     waypoints = list
-
 
     def set_folder(self, folder):
         self.folder = folder
@@ -153,18 +153,19 @@ class Pathfinder:
         '''
         if not hasattr(self, 'segments'):
             self.generate_trajectory()
-        
+
         fieldnames = ['dt', 'distance', 'velocity', 'acceleration', 'jerk', 'angle']
-        
+
         left_writer = csv.DictWriter("%s/left_tank_trajectory.csv" % self.folder, fieldnames=fieldnames)
         left_writer.writeheader()
-        
+
         right_writer = csv.DictWriter("%s/right_tank_trajectory.csv" % self.folder, fieldnames=fieldnames)
         right_writer.writeheader()
-        
+
         for segment in self.segments:
             left_writer.writerow({**segment.left.__dict__(), **segment.left_2d.__dict__()})
             right_writer.writerow({**segment.right.__dict__, **segment.right_2d.__dict__})
+
 
 if __name__ == "__main__":
     # Collect command line arguments

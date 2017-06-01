@@ -1,18 +1,17 @@
 from enum import IntEnum
-from util.units import Distance, Time
-from util.decorators import attr_check, type_check, void
+from utils.units import Distance, Time
+from utils.decorators import attr_check, type_check, void
 from structs.segment import Segment
 
 
 class ProfileType(IntEnum):
-    ''' An enumeration of the motion profile types.
-    '''
+    ''' An enumeration of the motion profile types. '''
     TRAPEZOIDAL = 0
+    SCURVE = 1
 
 
 class Status(IntEnum):
-    ''' An enumeration of the motion profile statuses.
-    '''
+    ''' An enumeration of the motion profile statuses. '''
     DONE = 0
     DECEL = 1
     ACCEL = 2
@@ -87,12 +86,14 @@ class Profile:
             Segment
                 The next segment in the path
         '''
-        temp = Segment(time=previous_segment.time, distance=previous_segment.distance, velocity=previous_segment.velocity, acceleration=previous_segment.acceleration)
+        temp = Segment(time=previous_segment.time,
+                       distance=previous_segment.distance,
+                       velocity=previous_segment.velocity,
+                       acceleration=previous_segment.acceleration)
 
         dt = t - previous_segment.time
 
         slice_count = int(dt.base_value / self.timescale.base_value)
-
 
         # The time difference provided is smaller than the target timescale,
         # use the smaller of the two.

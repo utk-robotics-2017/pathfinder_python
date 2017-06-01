@@ -1,4 +1,3 @@
-from enum import IntEnum
 import numpy as np
 import math
 from .spline import Spline, SplineType
@@ -29,8 +28,8 @@ class Hermite(Spline):
         self.hyp_distance = math.sqrt(dx ** 2 + dy ** 2)
         self.tangent0 = math.tan(start.angle - self.angle_offset)
         self.tangent1 = math.tan(end.angle - self.angle_offset)
-        self.a = self.tangent0 * hyp_distance
-        self.b = self.tangent1 * hyp_distance
+        self.a = self.tangent0 * self.hyp_distance
+        self.b = self.tangent1 * self.hyp_distance
 
         # Cache the arc calc to save time
         self.last_arc_calc = 0

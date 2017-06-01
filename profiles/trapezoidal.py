@@ -1,6 +1,6 @@
 from .profile import Profile, Status
-from util.decorators import attr_check, type_check, void
-from util.units import Distance, Velocity, Acceleration, Time
+from utils.decorators import attr_check, type_check, void
+from utils.units import Distance, Velocity, Acceleration, Time
 from structs.segment import Segment
 
 

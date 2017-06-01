@@ -1,6 +1,7 @@
+import math
 from .profile import Profile, Status
-from ..util.decorators import attr_check, type_check
-from ..util.units import Distance, Velocity, Acceleration, zero_unit
+from ..utils.decorators import attr_check, type_check, void
+from ..utils.units import Distance, Velocity, Acceleration, Jerk, Time, zero_unit
 from ..structs.segment import Segment
 from .trapezoidal import Trapezoidal
 
@@ -15,7 +16,7 @@ class Scurve(Profile):
     velocity_profile = Trapezoidal
 
     @type_check
-    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, jerk: Jerk, tolerance: Distance=Distance(0.05 , Distance.inch), timescale: Time=Time(0.001, Time.s)):
+    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, jerk: Jerk, tolerance: Distance=Distance(0.05, Distance.inch), timescale: Time=Time(0.001, Time.s)):
         self.max_velocity = max_velocity
         self.max_acceleration = acceleration
         self.jerk = jerk
@@ -26,14 +27,14 @@ class Scurve(Profile):
         self.velocity_profile.set_setpoint(max_velocity)
 
     def calculate_single(self, t: Time, previous_segment: (void, Segment)=None):
-
-
         velocity_segment_in = Segment(time=previous_segment.time,
                                       distance=Distance(previous_segment.velocity.base_value),
                                       velocity=Velocity(previous_segment.acceleration.base_value))
 
         velocity_segment = Segment()
         segment = Segment(time=t)
+
+        dt = t - previous_segment.time
 
         if abs(previous_segment.distance - self.setpoint) < self.tolerance:
             self.jerk_out = zero_unit
@@ -51,7 +52,7 @@ class Scurve(Profile):
         vpstatus = 0
         max_acceleration = self.max_acceleration if self.setpoint > 0 else -self.max_acceleration
         triangle_peak_time = math.sqrt(2 * (previous_segment.velocity / 2) / jerk)
-        saturation_time = (-self.max_acceleration - previous_segment.acceleration) / (-jerk)
+        saturation_time = (-max_acceleration - previous_segment.acceleration) / (-jerk)
 
         dejerk_dist = previous_segment.velocity * triangle_peak_time
         if abs(saturation_time) < abs(triangle_peak_time):
@@ -86,10 +87,10 @@ class Scurve(Profile):
         # TODO: Unfortunately we can't use trapezoidal profiles for the velocity profile.
         # This is because we can't integrate the velocity the way we normally would, making it very
         # difficult to accurately generate a path.
-        
-        if (abs(dejerk_error) <= self.tolerance or
-            (self.setpoint < 0 and dejerk_error < -self.tolerance) or
-            (self.setpoint > 0 and dejerk_error > self.tolerance)):
+
+        if(abs(dejerk_error) <= self.tolerance or
+           (self.setpoint < 0 and dejerk_error < -self.tolerance) or
+           (self.setpoint > 0 and dejerk_error > self.tolerance)):
             self.velocity_profile.distance_integral = previous_segment.distance
             self.velocity_profile.set_setpoint(0)
             vpstatus, velocity_segment = self.velocity_profile.calculate(t, velocity_segment_in)
@@ -101,7 +102,7 @@ class Scurve(Profile):
             return Status.DECEL, segment
         elif abs(previous_segment.velocity) < self.max_velocity - self.tolerance:
             self.velocity_profile.distance_integral = previous_segment.distance
-            self.velocity_profile.setpoint( -self.max_velocity if self.setpoint < 0 else self.max_velocity)
+            self.velocity_profile.setpoint(-self.max_velocity if self.setpoint < 0 else self.max_velocity)
             vpstatus, velocity_segment = self.velocity_profile.calculate(t, velocity_segment_in)
 
             self.jerk_out = velocity_segment.acceleration
