@@ -22,3 +22,6 @@ class Segment2D:
         self.x = kwargs.get('x', Distance(0))
         self.y = kwargs.get('y', Distance(0))
         self.angle = kwargs.get('angle', Angle(0))
+
+    def toWs(self) -> str:
+        return "{:.2f},{:2f},{:2f}".format(self.x.to(Distance.inch), self.y.to(Distance.inch), self.angle.to(Angle.degree))
