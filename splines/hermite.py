@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from .spline import Spline, SplineType
+from ..structs.spline_coord import SplineCoord
 
 
 class Hermite(Spline):
@@ -8,7 +9,7 @@ class Hermite(Spline):
         ANGLE_AUTO will only work using the Pathfinder::Spline::hermite() namespace method, not
         in the constructor or configure() method of Pathfinder::Spline::Hermite
         Furthermore, ANGLE_AUTO will work on every waypoint that is NOT the first
-        waypoint in the array, as the auto-generated angle is based on the slope of the 
+        waypoint in the array, as the auto-generated angle is based on the slope of the
         line joining waypoint and waypoint-1
     '''
     ANGLE_AUTO = 100000
@@ -64,7 +65,7 @@ class Hermite(Spline):
         return coord
 
     def deriv(self, t):
-        x = self.hyp_distance * t
+        # x = self.hyp_distance * t
         if self.type_ == SplineType.HERMITE_CUBIC:
             return ((3 * (self.tangent0 + self.tangent1) * t ** 2) +
                     (2 * -(2 * self.tangent0 + self.tangent1) * t
@@ -96,19 +97,18 @@ class Hermite(Spline):
             arc_length_ += (integrand + last_integrand) / 2
             last_integrand = integrand
 
-            last_arc_calc_samples = samples
+            # last_arc_calc_samples = samples
             last_arc_calc = self.hyp_distance * arc_length_
-        return last_arc_calc;
+        return last_arc_calc
 
-
-    @staticmethod
-    def get_splines(type_, waypoints):
-        for i in enum(1, len(waypoints)):
-            if (waypoints[i].angle == self.ANGLE_AUTO):
-                dx = waypoints[i].x - waypoints[i-1].x
-                dy = waypoints[i].y - waypoints[i-1].y
-                waypoints[i].angle = math.atan2(dy, dx)
+    @classmethod
+    def get_splines(cls, type_, waypoints):
+        # for i in range(1, len(waypoints)):
+        #     if (waypoints[i].angle == cls.ANGLE_AUTO):
+        #         dx = waypoints[i].x - waypoints[i-1].x
+        #         dy = waypoints[i].y - waypoints[i-1].y
+        #         waypoints[i].angle = math.atan2(dy, dx)
         splines = []
-        for i in enumerate(len(waypoints) - 1):
+        for i in range(len(waypoints) - 1):
             splines.add(Hermite(type_, waypoints[i], waypoints[i + 1]))
         return splines

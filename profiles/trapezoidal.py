@@ -26,7 +26,10 @@ class Trapezoidal(Profile):
     distance_integral = Distance
 
     @type_check
-    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, tolerance: Distance=Distance(0.05, Distance.inch), timescale: Time=Time(0.001, Time.s)):
+    def __init__(self, max_velocity: Velocity,
+                 acceleration: Acceleration,
+                 tolerance: Distance=Distance(0.05, Distance.inch),
+                 timescale: Time=Time(0.001, Time.s)):
         self.max_velocity = max_velocity
         self.acceleration = acceleration
         self.tolerance = tolerance
@@ -80,17 +83,26 @@ class Trapezoidal(Profile):
            (self.setpoint > 0 and decel_error > self.tolerance)):
             segment.acceleration = -accel
             segment.velocity = previous_segment.velocity - (accel * dt)
-            segment.distance = previous_segment.distance + (previous_segment.velocity * dt) - (0.5 * accel * dt ** 2)
-            self.distance_integral += previous_segment.distance * dt + (0.5 * previous_segment.velocity * dt ** 2) + (sixth * (-accel) * dt ** 3)
+            segment.distance = (previous_segment.distance +
+                                (previous_segment.velocity * dt) - (0.5 * accel * dt ** 2))
+            self.distance_integral += (previous_segment.distance * dt +
+                                       (0.5 * previous_segment.velocity * dt ** 2) +
+                                       (sixth * (-accel) * dt ** 3))
             return Status.DECEL, segment
 
         # Acceleration zone
         elif (abs(previous_segment.velocity) < self.max_velocity):
             segment.acceleration = accel
             v = previous_segment.velocity + (accel * dt)
-            segment.velocity = -self.max_velocity if v < -self.max_velocity else (self.max_velocity if v > self.max_velocity else v)
+            segment.velocity = (-self.max_velocity
+                                if v < -self.max_velocity
+                                else (self.max_velocity
+                                      if v > self.max_velocity
+                                      else v))
             segment.distance = previous_segment.distance + (previous_segment.velocity * dt) + (0.5 * accel * dt ** 2)
-            self.distance_integral += previous_segment.distance * dt + (0.5 * previous_segment.velocity * dt ** 2) + (sixth * accel * dt ** 3)
+            self.distance_integral += (previous_segment.distance * dt +
+                                       (0.5 * previous_segment.velocity * dt ** 2) +
+                                       (sixth * accel * dt ** 3))
             return Status.ACCEL, segment
 
         # Level

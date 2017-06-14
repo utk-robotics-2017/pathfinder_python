@@ -16,7 +16,11 @@ class Scurve(Profile):
     velocity_profile = Trapezoidal
 
     @type_check
-    def __init__(self, max_velocity: Velocity, acceleration: Acceleration, jerk: Jerk, tolerance: Distance=Distance(0.05, Distance.inch), timescale: Time=Time(0.001, Time.s)):
+    def __init__(self, max_velocity: Velocity,
+                 acceleration: Acceleration,
+                 jerk: Jerk,
+                 tolerance: Distance=Distance(0.05, Distance.inch),
+                 timescale: Time=Time(0.001, Time.s)):
         self.max_velocity = max_velocity
         self.max_acceleration = acceleration
         self.jerk = jerk
