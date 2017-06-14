@@ -1,12 +1,13 @@
-from structs.trajectory import Trajectory
+import math
 from structs.config import Config
 from structs.coupled_segment import CoupledSegment
-from splines.spline import SplineType
+from splines.spline import Spline, SplineType
 from splines.hermite import Hermite
 from profiles.profile import Profile, ProfileType
 from profiles.trapezoidal import Trapezoidal
-from util.decorators import attr_check, type_check, singleton
-from util.units import Distance, Time
+from utils.decorators import attr_check, type_check  # , singleton
+from utils.units import Distance, Time
+
 
 @attr_check
 class TrajectoryGenerator:
@@ -19,7 +20,7 @@ class TrajectoryGenerator:
         spline_type: int, SplineType
             Enumeration representing the type of spline to be used
         spline_class: class that is a child of Spline
-            Spline class that is used to generate the splines 
+            Spline class that is used to generate the splines
         profile_type: int, ProfileType
             Enumeration representing the type of motion profile to be used
         profile: Profile
@@ -37,7 +38,8 @@ class TrajectoryGenerator:
     spline_number = int
 
     @type_check
-    def __init__(self, config: Config, spline_type: (int, SplineType)=SplineType.HERMITE_CUBIC, profile_type: (int, ProfileType)=ProfileType.TRAPEZOIDAL):
+    def __init__(self, config: Config, spline_type: (int, SplineType)=SplineType.HERMITE_CUBIC,
+                 profile_type: (int, ProfileType)=ProfileType.TRAPEZOIDAL):
         ''' Constructor
 
             Parameters
@@ -72,7 +74,7 @@ class TrajectoryGenerator:
             Returns
             -------
             list(CoupledSegment)
-                A list of the segments (center, left, and right) in terms of coupled to the 2d locations for them 
+                A list of the segments (center, left, and right) in terms of coupled to the 2d locations for them
         '''
         self.waypoints = waypoints
 
@@ -89,7 +91,7 @@ class TrajectoryGenerator:
         t = 0
         segments = []
 
-        while previous_segment.center.distance < self.total_distance and spline_number < len(self.splines):
+        while previous_segment.center.distance < self.total_distance and self.spline_number < len(self.splines):
             previous_segment = self.calculate(t, previous_segment)
             if previous_segment is None:
                 break

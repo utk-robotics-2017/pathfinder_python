@@ -1,5 +1,6 @@
-from util.decorators import attr_check
-from util.units import Time, Velocity, Acceleration, Jerk
+from utils.decorators import attr_check
+from utils.units import Time, Velocity, Acceleration, Jerk
+
 
 @attr_check
 class Config:

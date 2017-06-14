@@ -1,5 +1,6 @@
-from util.units import Distance, Angle
-from util.decorators import attr_check, type_check
+from utils.units import Distance, Angle
+from utils.decorators import attr_check, type_check
+
 
 @attr_check
 class Segment2D:
@@ -23,5 +24,8 @@ class Segment2D:
         self.y = kwargs.get('y', Distance(0))
         self.angle = kwargs.get('angle', Angle(0))
 
+    @type_check
     def toWs(self) -> str:
-        return "{:.2f},{:2f},{:2f}".format(self.x.to(Distance.inch), self.y.to(Distance.inch), self.angle.to(Angle.degree))
+        return "{:.2f},{:2f},{:2f}".format(self.x.to(Distance.inch),
+                                           self.y.to(Distance.inch),
+                                           self.angle.to(Angle.degree))

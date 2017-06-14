@@ -93,7 +93,7 @@ class Server(tornado.websocket.WebSocketHandler):
 
             cmd = "PostWaypoints"
             if message[:len(cmd)] == cmd:
-            '''
+                '''
                 data = json.loads(message[len(cmd):])
                 pathName = data["name"]
                 waypoints = data["waypoints"]
@@ -105,19 +105,19 @@ class Server(tornado.websocket.WebSocketHandler):
                     for w in waypoints:
                         f.write("{},{},{}\n".format(w['x'], w['y'], w['r']))
                 log(self.id, "posted waypoints for " + pathName)
-            '''
-            #cmd = "GetTrajectories"
-            #if message[:len(cmd)] == cmd:
-            #    waypointsJson = message[len(cmd):]
+                '''
+                # cmd = "GetTrajectories"
+                # if message[:len(cmd)] == cmd:
+                #    waypointsJson = message[len(cmd):]
                 p.waypoints = json.loads(waypointsJson)
-                response = dict()
+                # response = dict()
                 p.generate_trajectory()
-                #center = [s.center_2d for s in p.segments]
-                #response['trajectory'] = center
-                #left = [s.left_2d for s in p.segments]
-                #right = [s.right_2d for s in p.segments]
-                #response['tank_left_trajectory'] = left
-                #response['tank_right_trajectory'] = right
+                # center = [s.center_2d for s in p.segments]
+                # response['trajectory'] = center
+                # left = [s.left_2d for s in p.segments]
+                # right = [s.right_2d for s in p.segments]
+                # response['tank_left_trajectory'] = left
+                # response['tank_right_trajectory'] = right
 
                 self.write_message("TrajectoryMain" + ';'.join([s.center_2d.toWs() for s in p.segments]))
                 log(self.id, "request for trajectories")

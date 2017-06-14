@@ -1,5 +1,5 @@
-from util.units import Distance, Velocity, Acceleration, Jerk, Time
-from util.decorators import attr_check, type_check
+from utils.units import Distance, Velocity, Acceleration, Jerk, Time
+from utils.decorators import attr_check, type_check
 
 
 @attr_check

@@ -1,5 +1,5 @@
-from util.decorators import attr_check, type_check
-from util.units import Distance, Angle
+from utils.decorators import attr_check, type_check
+from utils.units import Distance, Angle
 
 
 @attr_check
