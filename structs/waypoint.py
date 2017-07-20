@@ -9,7 +9,7 @@ class Waypoint:
     angle = Angle
 
     @type_check
-    def __init__(self, x: Distance, y: Distance, angle: Angle):
-        self.x = x
-        self.y = y
-        self.angle = angle
+    def __init__(self, x: (int, float), y: (int, float), r: (int, float)):
+        self.x = Distance(x)
+        self.y = Distance(y)
+        self.angle = Angle(r)

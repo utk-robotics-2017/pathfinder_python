@@ -1,4 +1,6 @@
 from enum import IntEnum
+from ..util.units import Distance, Time
+from ..utils.decorators import type_check
 
 
 class SplineType(IntEnum):
@@ -7,22 +9,27 @@ class SplineType(IntEnum):
 
 
 class Spline:
-    def calculate(self, t):
+    @type_check
+    def calculate(self, t: Time):
         raise NotImplementedError("Spline calculate")
 
-    def derive(self, t):
+    @type_check
+    def derive(self, t: Time):
         raise NotImplementedError("Spline derive")
 
-    def arc_length(self, samples):
+    @type_check
+    def arc_length(self, samples: list):
         raise NotImplementedError("Spline arc_length")
 
     @staticmethod
+    @type_check
     def get_splines():
         raise NotImplementedError("Spline get_splines")
 
     @staticmethod
-    def distance(splines, samples):
-        dist = 0
+    @type_check
+    def distance(splines: list, samples: list) -> Distance:
+        dist = Distance(0)
         for spline in splines:
             dist += spline.arc_length(samples)
         return dist

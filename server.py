@@ -11,6 +11,10 @@ import tornado.websocket
 import tornado.httpserver
 
 from pathfinder import Pathfinder
+from structs.waypoint import Waypoint
+
+from utils.decorators import ignore_decorators_traceback
+
 
 clients = set()
 clientId = 0
@@ -19,8 +23,9 @@ port = 9001
 pin = random.randint(0, 99999)
 pathsFolder = "/Robot/Trajectories"
 configFilepath = "{0:s}/robotConfig.json".format(pathsFolder)
-p = Pathfinder
-
+p = Pathfinder()
+if os.path.exists(configFilepath):
+    p.load_config(configFilepath, False)
 
 def log(wsId, message):
     print("{0:s}\tClient {1:2d}\t{2:s}".format(time.strftime("%H:%M:%S", time.localtime()), wsId, message))
@@ -43,22 +48,34 @@ class Server(tornado.websocket.WebSocketHandler):
 
         log(self.id, "connected with ip: " + self.request.remote_ip)
 
-    def on_message(self, message):
-        if not self.verified:
-            try:
-                clientPin = int(message)
-            except ValueError:
-                self.write_message("Invalid Pin")
-                log(self.id, "entered an invalid pin: " + message)
-                return
+        self.write_message('Verified')
+        self.verified = True
+        if os.path.exists(configFilepath):
+            with open(configFilepath, 'r') as jsonFile:
+                jsonData = jsonFile.read().replace('\n', '')
+                self.write_message("RobotConfig" + jsonData)
 
-            if clientPin == pin:
-                self.verified = True
-                self.write_message("Verified")
-                log(self.id, "entered correct pin")
-            else:
-                self.write_message("WrongPin")
-                log(self.id, "entered wrong pin")
+    def on_message(self, message):
+        log(self.id, "Message received: " + message)
+        if not self.verified:
+            #try:
+            #    clientPin = int(message)
+            #except ValueError:
+            #    self.write_message("Invalid Pin")
+            #    log(self.id, "entered an invalid pin: " + message)
+            #    return
+
+            #if clientPin == pin:
+            self.verified = True
+            self.write_message("Verified")
+            log(self.id, "entered correct pin")
+            if os.path.exists(configFilepath):
+                with open(configFilepath, 'r') as jsonFile:
+                    jsonData = jsonFile.read().replace('\n', '')
+                    self.write_message("RobotConfig" + jsonData)
+            #else:
+            #    self.write_message("WrongPin")
+            #    log(self.id, "entered wrong pin")
 
         else:
             cmd = "GetConfig"
@@ -77,9 +94,9 @@ class Server(tornado.websocket.WebSocketHandler):
             if message[:len(cmd)] == cmd:
                 with open(configFilepath, 'w') as jsonFile:
                     jsonFile.write(message[len(cmd):])
-                    p.load_config(configFilepath, False)
-                    self.write_message("PostedRobotConfig")
-                    log(self.id, "posted robot config")
+                p.load_config(configFilepath, False)
+                self.write_message("PostedRobotConfig")
+                log(self.id, "posted robot config")
                 return
 
             cmd = "GetWaypoints"
@@ -108,8 +125,11 @@ class Server(tornado.websocket.WebSocketHandler):
                 '''
                 # cmd = "GetTrajectories"
                 # if message[:len(cmd)] == cmd:
-                #    waypointsJson = message[len(cmd):]
-                p.waypoints = json.loads(waypointsJson)
+                waypointsJson = message[len(cmd):]
+                p.waypoints = []
+                temp = json.loads(waypointsJson)['waypoints']
+                for d in temp:
+                    p.waypoints.append(Waypoint(**d))
                 # response = dict()
                 p.generate_trajectory()
                 # center = [s.center_2d for s in p.segments]
@@ -144,7 +164,13 @@ class SetupTLS(tornado.web.RequestHandler):
 
 
 def make_app():
-    return tornado.httpserver.HTTPServer(tornado.web.Application([(r"/", Server), (r"/setuptls", SetupTLS)]))
+    return tornado.httpserver.HTTPServer(tornado.web.Application([
+        (r"/", Server),
+        (r"/setuptls", SetupTLS)]),
+        ssl_options={
+            "certfile": "/etc/ssl/certs/tornado.crt",
+            "keyfile": "/etc/ssl/certs/tornado.key"
+        })
 
 
 def sigInt_handler(signum, frame):
@@ -159,9 +185,14 @@ def sigInt_handler(signum, frame):
     sys.exit(0)
 
 
-if __name__ == "__main__":
+@ignore_decorators_traceback
+def main():
     app = make_app()
     app.listen(port)
     signal.signal(signal.SIGINT, sigInt_handler)
     print("Pin: {:05d}".format(pin))
     tornado.ioloop.IOLoop.current().start()
+
+
+if __name__ == "__main__":
+    main()

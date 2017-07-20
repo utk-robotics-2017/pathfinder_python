@@ -33,7 +33,6 @@ class Pathfinder:
             An integer representing the enumeration of the type of spline to use.
         waypoints: list(Waypoint)
             A list of the Waypoint structs used for generating the trajectory.
-
     '''
 
     folder = str
@@ -69,7 +68,6 @@ class Pathfinder:
             copy: bool
                 Whether to copy the config file into the output folder.
                 Default is true.
-
         '''
         if copy:
             shutil.copyfile(filepath, "%s/robot_config.json" % self.folder)
@@ -94,7 +92,6 @@ class Pathfinder:
             copy: bool
                 Whether to copy the waypoints file into the output folder.
                 Default is true.
-
         '''
         if copy:
             shutil.copyfile(filepath, "%s/waypoints.csv" % self.folder)
@@ -107,8 +104,7 @@ class Pathfinder:
 
     @type_check
     def save_waypoints(self) -> void:
-        ''' Saves the waypoints as a csv to a file in the output folder.
-        '''
+        ''' Saves the waypoints as a csv to a file in the output folder.'''
         with open("%s/waypoints.csv" % self.folder, 'w') as csv_file:
             fieldnames = ['x', 'y', 'angle']
             writer = csv.DictWriter(csv_file, fieldnames=fieldnames)
@@ -118,9 +114,7 @@ class Pathfinder:
 
     @type_check
     def generate_trajectory(self) -> void:
-        ''' Generates the trajectory based on the config and waypoints.
-
-        '''
+        ''' Generates the trajectory based on the config and waypoints.'''
         if not hasattr(self, 'trajectory_config'):
             logger.error("Config file has not been loaded")
             sys.exit()
@@ -135,8 +129,7 @@ class Pathfinder:
 
     @type_check
     def write_trajectory(self) -> void:
-        ''' Writes the center trajectory to a file in the output folder.
-        '''
+        ''' Writes the center trajectory to a file in the output folder.'''
         if not hasattr(self, 'segments'):
             self.generate_trajectory()
 

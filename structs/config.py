@@ -17,5 +17,3 @@ class Config:
         self.max_acceleration = Acceleration(kwargs['max_acceleration'])
         self.max_jerk = Jerk(kwargs['max_jerk'])
         self.sample_count = int(kwargs['sample_count'])
-
-        self.__dict__.update(kwargs)

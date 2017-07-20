@@ -63,6 +63,10 @@ class TrajectoryGenerator:
             self.profile = Trapezoidal(max_velocity=config.max_velocity, acceleration=config.max_acceleration)
 
     @type_check
+    def set_wheelbase(self, wheelbase: Distance):
+        self.wheelbase = wheelbase
+
+    @type_check
     def generate(self, waypoints: list) -> list:
         ''' Generates a list of segments from the waypoints
 
@@ -80,7 +84,7 @@ class TrajectoryGenerator:
 
         self.splines = self.spline_class.get_splines(self.spline_type, self.waypoints)
 
-        self.total_distance = Spline.distance(self.splines)
+        self.total_distance = Spline.distance(self.splines, self.waypoints)
 
         self.profile.setpoint(self.total_distance)
 
